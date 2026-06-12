@@ -8,6 +8,20 @@ verify that the platform heals itself automatically.
 
 ---
 
+## 🌐 Live Demo
+
+▶️ **[Try the interactive control-room demo](https://your-demo-url-here)**
+
+A self-contained simulation of the auto-healing loop — click **"inject chaos"**
+to watch a task get killed, an alarm fire, the Auto-Healer Lambda react, and a
+replacement task spin back up to healthy, complete with a live MTTR timer and
+event log (same flow as `scripts/inject_chaos.sh`, running entirely in your
+browser, no AWS account required).
+
+![Demo preview](https://your-screenshot-url-here)
+
+---
+
 ## 🧠 Core Idea
 
 Kubernetes constantly compares *desired state* vs *actual state* and takes
