@@ -10,7 +10,7 @@ verify that the platform heals itself automatically.
 
 ## 🌐 Live Demo
 
-▶️ **[Try the interactive control-room demo](https://your-demo-url-here)**
+▶️ **[Try the interactive control-room demo](file:///C:/Users/yash/Downloads/autoheal-ecs-demo.html)**
 
 A self-contained simulation of the auto-healing loop — click **"inject chaos"**
 to watch a task get killed, an alarm fire, the Auto-Healer Lambda react, and a
