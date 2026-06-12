@@ -1,6 +1,3 @@
-
-
-
 # Auto-Healing Kubernetes-Like ECS Platform with CloudWatch Chaos Engineering
 
 A self-healing container platform built on **Amazon ECS (Fargate)** that mimics
@@ -32,7 +29,8 @@ replicates that control loop on top of AWS-native primitives:
 
 ## 🏗️ Architecture
 
-┌─────────────────────────┐
+```
+                       ┌─────────────────────────┐
                        │      Internet / User     │
                        └────────────┬─────────────┘
                                      │
@@ -67,12 +65,13 @@ replicates that control loop on top of AWS-native primitives:
                         ┌──────▼──────┐
                         │  SNS Topic  │──► Slack / Email Notifier Lambda
                         └─────────────┘
-
+```
 
 ---
 
 ## 📁 Project Structure
 
+```
 auto-healing-ecs-platform/
 ├── terraform/                 # All infrastructure as code
 │   ├── main.tf                # Providers, backend, module wiring
@@ -122,13 +121,13 @@ auto-healing-ecs-platform/
 │
 ├── .gitignore
 └── README.md
-
+```
 
 ---
 
 ## 🚀 Quick Start
 
-bash
+```bash
 # 1. Build and push the sample app image to ECR (done by deploy.sh)
 # 2. Deploy infrastructure
 cd terraform
@@ -146,24 +145,24 @@ terraform apply
 #    - Auto-Healer calls ecs:UpdateService (force new deployment) or
 #      ecs:StartTask to restore desired_count
 #    - SNS notification sent via Notifier Lambda
-
+```
 
 ---
 
 ## 🔁 Self-Healing Loop (Reconciliation)
 
 1. **Observe** – CloudWatch Container Insights + ALB metrics continuously
-   monitor RunningTaskCount, HealthyHostCount, CPUUtilization,
-   MemoryUtilization.
+   monitor `RunningTaskCount`, `HealthyHostCount`, `CPUUtilization`,
+   `MemoryUtilization`.
 2. **Detect Drift** – CloudWatch Alarms fire when:
-   - HealthyHostCount < desired_count
-   - A task transitions to STOPPED unexpectedly (captured via EventBridge
-     rule on ECS Task State Change)
+   - `HealthyHostCount < desired_count`
+   - A task transitions to `STOPPED` unexpectedly (captured via EventBridge
+     rule on `ECS Task State Change`)
    - CPU/Memory exceeds thresholds (triggers scale-out, like HPA)
 3. **Reconcile** – Auto-Healer Lambda:
-   - Calls ecs update-service --force-new-deployment to replace unhealthy
+   - Calls `ecs update-service --force-new-deployment` to replace unhealthy
      tasks
-   - Calls ecs update-service --desired-count to restore replica count
+   - Calls `ecs update-service --desired-count` to restore replica count
    - Optionally scales out via Application Auto Scaling if CPU/Mem high
 4. **Notify** – Notifier Lambda posts a summary to SNS/Slack with what was
    healed and why.
@@ -173,15 +172,15 @@ terraform apply
 
 ## 🧪 Chaos Engineering Scenarios
 
-See [docs/chaos_scenarios.md](docs/chaos_scenarios.md) for full details.
+See [`docs/chaos_scenarios.md`](docs/chaos_scenarios.md) for full details.
 Summary:
 
 | Scenario | Chaos Action | Expected Self-Healing |
 |----------|--------------|------------------------|
-| Task Crash | StopTask on a random running task | ECS reschedules task; Auto-Healer forces redeployment if needed |
-| Service Under-Capacity | Manually set desired_count to 0 temporarily | Auto-Healer restores desired count |
+| Task Crash | `StopTask` on a random running task | ECS reschedules task; Auto-Healer forces redeployment if needed |
+| Service Under-Capacity | Manually set `desired_count` to 0 temporarily | Auto-Healer restores desired count |
 | CPU Spike | Inject CPU stress via SSM command in container | CloudWatch Alarm triggers Application Auto Scaling scale-out |
-| Unhealthy Target | App returns HTTP 500 on /health | ALB marks target unhealthy → ECS replaces task |
+| Unhealthy Target | App returns HTTP 500 on `/health` | ALB marks target unhealthy → ECS replaces task |
 | AZ Failure Simulation | Drain all tasks in one subnet/AZ | Service reschedules tasks into healthy AZs |
 
 ---
@@ -195,24 +194,24 @@ Summary:
 - **Lambda (Python 3.12)** – auto-healer, chaos injector, notifier
 - **SNS** – alerting
 - **Terraform** – infrastructure as code
-- **Flask** – sample microservice with /health and /chaos endpoints
+- **Flask** – sample microservice with `/health` and `/chaos` endpoints
 
 ---
 
 ## 📊 Observability
 
-- monitoring/cloudwatch_dashboard.json — pre-built dashboard showing
+- `monitoring/cloudwatch_dashboard.json` — pre-built dashboard showing
   RunningTaskCount, HealthyHostCount, CPU/Mem, alarm states, and Lambda
   invocation counts (heal events).
-- monitoring/alarms.json — reference definitions for all CloudWatch alarms
-  created by terraform/cloudwatch.tf.
+- `monitoring/alarms.json` — reference definitions for all CloudWatch alarms
+  created by `terraform/cloudwatch.tf`.
 
 ---
 
 ## 🧹 Cleanup
 
-bash
+```bash
 ./scripts/cleanup.sh
+```
 
-
-This runs terraform destroy and removes any ECR images pushed for the demo.
+This runs `terraform destroy` and removes any ECR images pushed for the demo.
