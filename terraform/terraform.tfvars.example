@@ -1,0 +1,32 @@
+###############################################################################
+# Example tfvars - copy to terraform.tfvars and customize
+###############################################################################
+
+aws_region   = "us-east-1"
+environment  = "dev"
+project_name = "autoheal-ecs"
+
+vpc_cidr             = "10.20.0.0/16"
+public_subnet_cidrs  = ["10.20.0.0/24", "10.20.1.0/24"]
+private_subnet_cidrs = ["10.20.10.0/24", "10.20.11.0/24"]
+
+# Leave blank to use the auto-created ECR repo (deploy.sh will build & push)
+container_image = ""
+container_port  = 8080
+
+desired_count = 3
+min_capacity  = 2
+max_capacity  = 6
+
+task_cpu    = "256"
+task_memory = "512"
+
+healthy_host_alarm_threshold = 2
+cpu_high_threshold            = 70
+
+chaos_enabled             = true
+chaos_schedule_expression = "rate(15 minutes)"
+chaos_kill_probability    = 0.5
+
+notification_email = "you@example.com"
+slack_webhook_url  = ""

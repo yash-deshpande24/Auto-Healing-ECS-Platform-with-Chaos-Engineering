@@ -1,0 +1,110 @@
+{
+  "widgets": [
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 2,
+      "properties": {
+        "markdown": "# Auto-Healing ECS Platform Dashboard\nTrack desired vs running task counts, target health, resource utilization, and self-healing / chaos events."
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 2,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ECS Service: Running vs Desired Tasks",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["ECS/ContainerInsights", "RunningTaskCount", "ClusterName", "autoheal-ecs-cluster", "ServiceName", "autoheal-ecs-service", { "label": "RunningTaskCount" }],
+          ["ECS/ContainerInsights", "DesiredTaskCount", "ClusterName", "autoheal-ecs-cluster", "ServiceName", "autoheal-ecs-service", { "label": "DesiredTaskCount" }],
+          ["ECS/ContainerInsights", "PendingTaskCount", "ClusterName", "autoheal-ecs-cluster", "ServiceName", "autoheal-ecs-service", { "label": "PendingTaskCount" }]
+        ],
+        "period": 60,
+        "stat": "Average",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 2,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ALB: Healthy vs Unhealthy Hosts",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["AWS/ApplicationELB", "HealthyHostCount", "TargetGroup", "REPLACE_WITH_TG_ARN_SUFFIX", "LoadBalancer", "REPLACE_WITH_ALB_ARN_SUFFIX", { "label": "HealthyHostCount" }],
+          ["AWS/ApplicationELB", "UnHealthyHostCount", "TargetGroup", "REPLACE_WITH_TG_ARN_SUFFIX", "LoadBalancer", "REPLACE_WITH_ALB_ARN_SUFFIX", { "label": "UnHealthyHostCount" }]
+        ],
+        "period": 60,
+        "stat": "Average",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 8,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ECS Service: CPU & Memory Utilization",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["ECS/ContainerInsights", "CpuUtilized", "ClusterName", "autoheal-ecs-cluster", "ServiceName", "autoheal-ecs-service", { "label": "CPU Utilized" }],
+          ["ECS/ContainerInsights", "MemoryUtilized", "ClusterName", "autoheal-ecs-cluster", "ServiceName", "autoheal-ecs-service", { "label": "Memory Utilized" }]
+        ],
+        "period": 60,
+        "stat": "Average",
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 8,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "title": "ALB: Request Count & 5XX Errors",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "REPLACE_WITH_ALB_ARN_SUFFIX", { "label": "RequestCount", "stat": "Sum" }],
+          ["AWS/ApplicationELB", "HTTPCode_Target_5XX_Count", "LoadBalancer", "REPLACE_WITH_ALB_ARN_SUFFIX", { "label": "5XX Errors", "stat": "Sum" }]
+        ],
+        "period": 60,
+        "region": "us-east-1"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 14,
+      "width": 24,
+      "height": 6,
+      "properties": {
+        "title": "Self-Healing & Chaos Lambda Invocations / Errors",
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          ["AWS/Lambda", "Invocations", "FunctionName", "autoheal-ecs-auto-healer", { "label": "Auto-Healer Invocations", "stat": "Sum" }],
+          ["AWS/Lambda", "Errors", "FunctionName", "autoheal-ecs-auto-healer", { "label": "Auto-Healer Errors", "stat": "Sum" }],
+          ["AWS/Lambda", "Invocations", "FunctionName", "autoheal-ecs-chaos-injector", { "label": "Chaos Injector Invocations", "stat": "Sum" }],
+          ["AWS/Lambda", "Invocations", "FunctionName", "autoheal-ecs-notifier", { "label": "Notifier Invocations", "stat": "Sum" }]
+        ],
+        "period": 300,
+        "region": "us-east-1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+# boto3 is included in the AWS Lambda Python runtime, so no third-party
+# dependencies are required. This file is kept for clarity / future deps.

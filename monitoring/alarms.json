@@ -1,0 +1,53 @@
+{
+  "description": "Reference definitions of CloudWatch alarms created by terraform/cloudwatch.tf. This file is documentation only — the actual alarms are managed by Terraform.",
+  "alarms": [
+    {
+      "name": "${project_name}-unhealthy-hosts",
+      "metric": "HealthyHostCount",
+      "namespace": "AWS/ApplicationELB",
+      "comparison": "LessThanThreshold",
+      "threshold_variable": "healthy_host_alarm_threshold",
+      "evaluation_periods": 2,
+      "period_seconds": 60,
+      "statistic": "Average",
+      "purpose": "Detects when the ALB sees fewer healthy targets than expected, analogous to multiple K8s pods failing readiness probes.",
+      "actions": [
+        "Invoke Auto-Healer Lambda",
+        "Publish to SNS alerts topic"
+      ]
+    },
+    {
+      "name": "${project_name}-running-task-count-low",
+      "metric": "RunningTaskCount",
+      "namespace": "ECS/ContainerInsights",
+      "comparison": "LessThanThreshold",
+      "threshold_variable": "desired_count",
+      "evaluation_periods": 2,
+      "period_seconds": 60,
+      "statistic": "Average",
+      "purpose": "Detects drift between desired and running ECS task counts, analogous to a ReplicaSet having fewer pods than desired.",
+      "actions": [
+        "Invoke Auto-Healer Lambda",
+        "Publish to SNS alerts topic"
+      ]
+    }
+  ],
+  "event_rules": [
+    {
+      "name": "${project_name}-ecs-task-stopped",
+      "source": "aws.ecs",
+      "detail_type": "ECS Task State Change",
+      "filter": {
+        "lastStatus": ["STOPPED"]
+      },
+      "purpose": "Immediate notification when any ECS task in the cluster stops, allowing the Auto-Healer to react in near real-time rather than waiting for the next alarm evaluation period.",
+      "target": "Auto-Healer Lambda"
+    },
+    {
+      "name": "${project_name}-chaos-schedule",
+      "schedule_expression_variable": "chaos_schedule_expression",
+      "purpose": "Periodically invokes the Chaos Injector Lambda to randomly terminate ECS tasks and validate self-healing.",
+      "target": "Chaos Injector Lambda"
+    }
+  ]
+}
